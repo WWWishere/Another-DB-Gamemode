@@ -24,30 +24,6 @@ public class Bartender : Role
         charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
         charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
         charRef.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
-        Il2CppSystem.Collections.Generic.List<Character> characters = Gameplay.CurrentCharacters;
-        int charactersSize = characters.Count;
-        int tableNum = getTablePos(charRef.id);
-        int[] table = getTable(tableNum);
-        foreach (int charId in table)
-        {
-            Character ch = characters[charactersSize - charId];
-            if (ch.dataRef.name == "Drunk")
-            {
-                return;
-            }
-        }
-        foreach (int charId in table)
-        {
-            Character ch = characters[charactersSize - charId];
-            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.fo(ECharacterStatus.CorruptionResistant))
-            {
-                ch.statuses.fm(ECharacterStatus.Corrupted, charRef, null);
-                if (ch.dataRef.type == ECharacterType.Minion || ch.dataRef.type == ECharacterType.Demon)
-                {
-                    ch.statuses.fm(ECharacterStatus.HealthyBluff, charRef, null);
-                }
-            }
-        }
     }
     public int[] getTable(int tableNum)
     {
@@ -77,12 +53,13 @@ public class Bartender : Role
     }
     public override CharacterData bcz(Character charRef)
     {
+        serveTable(charRef);
         Characters instance = Characters.Instance;
         Gameplay gameplay = Gameplay.Instance;
         Il2CppSystem.Collections.Generic.List<CharacterData> uniquePool = new Il2CppSystem.Collections.Generic.List<CharacterData>();
         foreach (CharacterData data1 in instance.UniquePool)
         {
-            if (data1.bluffable)
+            if (data1.name != "Alchemist")
             {
                 uniquePool.Add(data1);
             }
@@ -90,14 +67,46 @@ public class Bartender : Role
         Il2CppSystem.Collections.Generic.List<CharacterData> currentTown = gameplay.currentTownsfolks;
         foreach (CharacterData data in currentTown)
         {
-            if (data.bluffable)
+            if (data.name != "Alchemist")
             {
                 uniquePool.Add(data);
             }
         }
         Il2CppSystem.Collections.Generic.List<CharacterData> townPool = instance.gw(uniquePool, ECharacterType.Villager);
         CharacterData randomData = townPool[UnityEngine.Random.RandomRangeInt(0, townPool.Count)];
+        if (GameData.GameMode is TavernMode)
+        {
+            TavernMode tavernMode = (TavernMode)GameData.GameMode;
+            tavernMode.replaceBartender(charRef, randomData);
+        }
         return randomData;
+    }
+    public void serveTable(Character charRef)
+    {
+        Il2CppSystem.Collections.Generic.List<Character> characters = Gameplay.CurrentCharacters;
+        int charactersSize = characters.Count;
+        int tableNum = getTablePos(charRef.id);
+        int[] table = getTable(tableNum);
+        foreach (int charId in table)
+        {
+            Character ch = characters[charactersSize - charId];
+            if (ch.dataRef.name == "Drunk")
+            {
+                return;
+            }
+        }
+        foreach (int charId in table)
+        {
+            Character ch = characters[charactersSize - charId];
+            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.fo(ECharacterStatus.CorruptionResistant))
+            {
+                ch.statuses.fm(ECharacterStatus.Corrupted, charRef, null);
+                if (ch.dataRef.type == ECharacterType.Minion || ch.dataRef.type == ECharacterType.Demon)
+                {
+                    ch.statuses.fm(ECharacterStatus.HealthyBluff, charRef, null);
+                }
+            }
+        }
     }
     public Bartender() : base(ClassInjector.DerivedConstructorPointer<Bartender>())
     {

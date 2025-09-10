@@ -7,6 +7,7 @@ using Il2CppInterop.Runtime.Injection;
 using Il2CppInterop.Runtime;
 using Il2CppSystem.Threading.Tasks;
 using System.Collections.Generic;
+using HarmonyLib;
 
 [assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.0", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
@@ -47,14 +48,14 @@ public class ModMain : MelonMod
         CharacterData bartender = TavernSave.createCharData("Bartender", "5", ECharacterType.Outcast,
         EAlignment.Good, new Bartender());
         bartender.bluffable = false;
-        bartender.description = "Villagers in my table will become Corrupted, Evils in my table must tell the truth.\nEffect cannot be reversed by Alchemist, but will be removed if a Drunk is present in my table.";
+        bartender.description = "I do not appear naturally.\n\nOne Villager gains the role of <b>Bartender.</b> The Bartender cannot be Corrupted or affected by Evils.";
         bartender.flavorText = "\"His drink-serving skills are unmatched. Though not like there was anyone to compete in the first place.\"";
         bartender.tags = new Il2CppSystem.Collections.Generic.List<ECharacterTag>();
         bartender.tags.Add(ECharacterTag.Corrupt);
         bartender.cardBgColor = new Color(0.196f, 0.101f, 0.034f);
         bartender.cardBorderColor = new Color(0.839f, 0.52f, 0.29f);
         bartender.color = new Color(1f, 0.5f, 0.4472f);
-        bartender.hints = "Evils affected by the bartender will count as Corrupted to the Tavernkeeper.";
+        bartender.hints = "Villagers in my table will become Corrupted, Evils in my table must tell the truth and will register as Corrupted.\n\nEffect cannot be reversed by Alchemist, but will be removed if a Drunk is present in my table.";
         TavernSave.bartender = bartender;
 
         CharacterData tavernkeeper = TavernSave.createCharData("Tavernkeeper", "5", ECharacterType.Outcast,
@@ -68,7 +69,7 @@ public class ModMain : MelonMod
         tavernkeeper.cardBgColor = new Color(0.196f, 0.101f, 0.034f);
         tavernkeeper.cardBorderColor = new Color(0.839f, 0.52f, 0.29f);
         tavernkeeper.color = new Color(1f, 0.5f, 0.4472f);
-        tavernkeeper.hints = "I can not Lie.";
+        tavernkeeper.hints = "I am always Good. \nI can not Lie.";
         TavernSave.tavernkeeper = tavernkeeper;
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", bartender);
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", tavernkeeper);
@@ -209,7 +210,7 @@ public static class TavernSave
     public static TavernMode tavern = new TavernMode();
     public static GameObject objTavernScore;
     public static GameObject objTavern;
-    public static List<string> poolUnused = new List<string> { "Mutant", "Wretch", "Marionette", "Puppet", "Bounty Hunter" };
+    public static List<string> poolUnused = new List<string> { "Mutant", "Wretch", "Marionette", "Puppet", "Bounty Hunter", "Bartender" };
     public static List<int> pool = new List<int>();
     public static List<int> poolEvil = new List<int>();
     public static CharacterData[] allData = Array.Empty<CharacterData>();
@@ -244,7 +245,7 @@ public static class TavernSave
             script.startingMinions = new Il2CppSystem.Collections.Generic.List<CharacterData>();
             script.startingDemons = new Il2CppSystem.Collections.Generic.List<CharacterData>();
             script.mustInclude = new Il2CppSystem.Collections.Generic.List<CharacterData>();
-            script.mustInclude.Add(bartender);
+            // script.mustInclude.Add(bartender);
             script.mustInclude.Add(tavernkeeper);
             foreach (int roleNum in pool)
             {
@@ -276,7 +277,7 @@ public static class TavernSave
     }
     public static int[] randRoleCount(int count)
     {
-        int[] counts = { count - 2, 0, 2, 0 };
+        int[] counts = { count - 1, 0, 1, 0 };
         List<int> tempPool = new List<int>(pool);
         List<int> tempPoolEvil = new List<int>(poolEvil);
         int evil = tempPool[UnityEngine.Random.RandomRangeInt(0, tempPoolEvil.Count)];
@@ -296,7 +297,7 @@ public static class TavernSave
             switch (allData[randomRole].type)
             {
                 case ECharacterType.Outcast:
-                    if (counts[2] < 5)
+                    if (counts[2] < 4)
                     {
                         counts[2]++;
                         counts[0]--;
@@ -399,5 +400,21 @@ public static class TavernSave
         }
         newPools[pools.Length] = pool;
         Characters.Instance.characterPool = newPools;
+    }
+
+    [HarmonyPatch(typeof(Character), nameof(Character.en))]
+    public static class BartenderText
+    {
+        public static void Postfix(Character __instance)
+        {
+            if (GameData.GameMode is TavernMode)
+            {
+                TavernMode tavernMode = (TavernMode)GameData.GameMode;
+                if (__instance.id == tavernMode.bartender_id)
+                {
+                    __instance.chName.text += "<color=orange><size=18>\nBartender</color></size>";
+                }
+            }
+        }
     }
 }

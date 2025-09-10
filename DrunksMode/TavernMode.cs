@@ -21,6 +21,7 @@ public class TavernMode : AdvancedMode
     public Il2CppSystem.Action action;
     public Il2CppSystem.Action action2;
     public Il2CppSystem.Action action4;
+    public int bartender_id = 0;
     public override EGameMode bha()
     {
         return EGameMode.Standard;
@@ -76,7 +77,7 @@ public class TavernMode : AdvancedMode
                 {
                     addScore(drunkBonus);
                 }
-                else if (character.dataRef.name == "Bartender")
+                else if (character.id == this.bartender_id)
                 {
                     addScore(bartenderBonus);
                 }
@@ -87,7 +88,7 @@ public class TavernMode : AdvancedMode
             }
         }
         UIEvents.OnUIUpdate.Invoke();
-
+        this.bartender_id = 0;
         TavernSave.tavern = this;
     }
 
@@ -167,6 +168,16 @@ public class TavernMode : AdvancedMode
         {
             bestScore = score;
         }
+    }
+
+    public void replaceBartender(Character charRef, CharacterData newRole)
+    {
+        charRef.dv(newRole);
+        this.bartender_id = charRef.id;
+        charRef.statuses.fn();
+        charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
+        charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
+        charRef.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
     }
 
     public override AscensionsData bhh()

@@ -41,6 +41,14 @@ public class Tavernkeeper : Role
         {
             charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
             charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
+            List<Character> allCharacters = Gameplay.CurrentCharacters;
+            Characters instance = Characters.Instance;
+            Gameplay gameplay = Gameplay.Instance;
+            List<Character> list1 = instance.hi(allCharacters);
+            List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
+            Character randomCharacter = list2[UnityEngine.Random.RandomRangeInt(0, list2.Count)];
+            randomCharacter.dv(TavernSave.bartender);
+            gameplay.ml(ECharacterType.Outcast, TavernSave.bartender);
         }
         else if (trigger == ETriggerPhase.Day)
         {
