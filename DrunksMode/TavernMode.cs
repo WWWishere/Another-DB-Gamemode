@@ -22,6 +22,7 @@ public class TavernMode : AdvancedMode
     public Il2CppSystem.Action action2;
     public Il2CppSystem.Action action4;
     public int bartender_id = 0;
+    public CharacterData? bartenderData;
     public override EGameMode bha()
     {
         return EGameMode.Standard;
@@ -177,7 +178,6 @@ public class TavernMode : AdvancedMode
         charRef.statuses.fn();
         charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
         charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
-        charRef.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
     }
 
     public override AscensionsData bhh()

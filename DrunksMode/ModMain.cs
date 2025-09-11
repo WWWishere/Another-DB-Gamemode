@@ -9,7 +9,7 @@ using Il2CppSystem.Threading.Tasks;
 using System.Collections.Generic;
 using HarmonyLib;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.0", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.2", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksMode;

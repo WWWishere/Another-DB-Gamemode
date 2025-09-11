@@ -46,7 +46,20 @@ public class Tavernkeeper : Role
             Gameplay gameplay = Gameplay.Instance;
             List<Character> list1 = instance.hi(allCharacters);
             List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
-            Character randomCharacter = list2[UnityEngine.Random.RandomRangeInt(0, list2.Count)];
+            List<Character> list3 = new List<Character>();
+            foreach (Character town in list2)
+            {
+                if (town.dataRef.name != "Alchemist")
+                {
+                    list3.Add(town);
+                }
+            }
+            Character randomCharacter = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
+            if (GameData.GameMode is TavernMode)
+            {
+                TavernMode tavernMode = (TavernMode)GameData.GameMode;
+                tavernMode.bartenderData = randomCharacter.dq();
+            }
             randomCharacter.dv(TavernSave.bartender);
             gameplay.ml(ECharacterType.Outcast, TavernSave.bartender);
         }

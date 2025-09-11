@@ -23,7 +23,6 @@ public class Bartender : Role
         }
         charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
         charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
-        charRef.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
     }
     public int[] getTable(int tableNum)
     {
@@ -51,9 +50,10 @@ public class Bartender : Role
         }
         return 3;
     }
-    public override CharacterData bcz(Character charRef)
+    public override CharacterData? bcz(Character charRef)
     {
         serveTable(charRef);
+        /*
         Characters instance = Characters.Instance;
         Gameplay gameplay = Gameplay.Instance;
         Il2CppSystem.Collections.Generic.List<CharacterData> uniquePool = new Il2CppSystem.Collections.Generic.List<CharacterData>();
@@ -74,12 +74,17 @@ public class Bartender : Role
         }
         Il2CppSystem.Collections.Generic.List<CharacterData> townPool = instance.gw(uniquePool, ECharacterType.Villager);
         CharacterData randomData = townPool[UnityEngine.Random.RandomRangeInt(0, townPool.Count)];
+        */
         if (GameData.GameMode is TavernMode)
         {
             TavernMode tavernMode = (TavernMode)GameData.GameMode;
-            tavernMode.replaceBartender(charRef, randomData);
+            CharacterData? bartenderData = tavernMode.bartenderData;
+            if (bartenderData != null)
+            {
+                tavernMode.replaceBartender(charRef, bartenderData);
+            }
         }
-        return randomData;
+        return null;
     }
     public void serveTable(Character charRef)
     {
