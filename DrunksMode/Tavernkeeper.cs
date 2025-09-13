@@ -41,32 +41,32 @@ public class Tavernkeeper : Role
         {
             charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
             charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
-            List<Character> allCharacters = Gameplay.CurrentCharacters;
-            Characters instance = Characters.Instance;
-            Gameplay gameplay = Gameplay.Instance;
-            List<Character> list1 = instance.hi(allCharacters);
-            List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
-            List<Character> list3 = new List<Character>();
-            foreach (Character town in list2)
-            {
-                if (town.dataRef.name != "Alchemist")
-                {
-                    list3.Add(town);
-                }
-            }
-            Character randomCharacter = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
             if (GameData.GameMode is TavernMode)
             {
+                List<Character> allCharacters = Gameplay.CurrentCharacters;
+                Characters instance = Characters.Instance;
+                Gameplay gameplay = Gameplay.Instance;
+                List<Character> list1 = instance.hi(allCharacters);
+                List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
+                List<Character> list3 = new List<Character>();
+                foreach (Character town in list2)
+                {
+                    if (town.dataRef.name != "Alchemist")
+                    {
+                        list3.Add(town);
+                    }
+                }
+                Character randomCharacter = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
                 TavernMode tavernMode = (TavernMode)GameData.GameMode;
                 tavernMode.bartenderData = randomCharacter.dq();
+                randomCharacter.dv(TavernSave.bartender);
+                gameplay.ml(ECharacterType.Outcast, TavernSave.bartender);
             }
-            randomCharacter.dv(TavernSave.bartender);
-            gameplay.ml(ECharacterType.Outcast, TavernSave.bartender);
         }
-        else if (trigger == ETriggerPhase.Day)
-        {
-            this.onActed.Invoke(this.bcq(charRef));
-        }
+            else if (trigger == ETriggerPhase.Day)
+            {
+                this.onActed.Invoke(this.bcq(charRef));
+            }
     }
     public override void bcx(ETriggerPhase trigger, Character charRef)
     {

@@ -9,7 +9,7 @@ using Il2CppSystem.Threading.Tasks;
 using System.Collections.Generic;
 using HarmonyLib;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.2", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.3", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksMode;
@@ -56,6 +56,7 @@ public class ModMain : MelonMod
         bartender.cardBorderColor = new Color(0.839f, 0.52f, 0.29f);
         bartender.color = new Color(1f, 0.5f, 0.4472f);
         bartender.hints = "Villagers in my table will become Corrupted, Evils in my table must tell the truth and will register as Corrupted.\n\nEffect cannot be reversed by Alchemist, but will be removed if a Drunk is present in my table.";
+        bartender.characterId = "Bartender_TAVERN";
         TavernSave.bartender = bartender;
 
         CharacterData tavernkeeper = TavernSave.createCharData("Tavernkeeper", "5", ECharacterType.Outcast,
@@ -70,6 +71,7 @@ public class ModMain : MelonMod
         tavernkeeper.cardBorderColor = new Color(0.839f, 0.52f, 0.29f);
         tavernkeeper.color = new Color(1f, 0.5f, 0.4472f);
         tavernkeeper.hints = "I am always Good. \nI can not Lie.";
+        tavernkeeper.characterId = "Tavernkeeper_TAVERN";
         TavernSave.tavernkeeper = tavernkeeper;
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", bartender);
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", tavernkeeper);
@@ -217,6 +219,7 @@ public static class TavernSave
     public static Sprite[] allSprites = Array.Empty<Sprite>();
     public static CharacterData bartender;
     public static CharacterData tavernkeeper;
+    public static ECharacterStatus bt = (ECharacterStatus)201;
     public static void createPool()
     {
         pool.Clear();
@@ -407,13 +410,9 @@ public static class TavernSave
     {
         public static void Postfix(Character __instance)
         {
-            if (GameData.GameMode is TavernMode)
+            if (__instance.statuses.fo(bt))
             {
-                TavernMode tavernMode = (TavernMode)GameData.GameMode;
-                if (__instance.id == tavernMode.bartender_id)
-                {
-                    __instance.chName.text += "<color=orange><size=18>\nBartender</color></size>";
-                }
+                __instance.chName.text += "<color=orange><size=18>\nBartender</color></size>";
             }
         }
     }
