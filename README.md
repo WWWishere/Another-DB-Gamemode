@@ -7,6 +7,9 @@ This gamemode supposedly takes place inside a tavern, with 18 cards split into 3
 I did not playtest this, and there is a lot of corruption-based stuff in this mode. Good luck.
 
 There are 2 special roles for this Game Mode.
+
 Bartender - can corrupt nearby characters.
+
 Tavernkeeper - can tell you how many characters are corrupt. 
+
 * Currently using Baa's sprite (again) for Tavernkeeper. It's not evil, it's just a placeholder sprite
