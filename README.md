@@ -8,4 +8,5 @@ I did not playtest this, and there is a lot of corruption-based stuff in this mo
 
 There are 2 special roles for this Game Mode.
 Bartender - can corrupt nearby characters.
-Tavernkeeper - can tell you how many characters are corrupt. (* Currently using Baa's sprite (again) it's not evil, it's just a placeeholder sprite)
+Tavernkeeper - can tell you how many characters are corrupt. 
+* Currently using Baa's sprite (again) for Tavernkeeper. It's not evil, it's just a placeholder sprite
