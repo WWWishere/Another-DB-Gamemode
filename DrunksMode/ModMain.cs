@@ -40,6 +40,7 @@ public class ModMain : MelonMod
         TavernSave.objTavern.transform.SetParent(leftUI.transform);
         TavernSave.objTavernScore.GetComponent<EnableOnMode>().mode = TavernSave.tavern;
         TavernSave.objTavern.GetComponent<EnableOnMode>().mode = TavernSave.tavern;
+        TavernSave.objTavern.GetComponent<EnableOnMode>().mode2 = null;
         TavernSave.objTavernScore.transform.localScale = new UnityEngine.Vector3(1f, 1f, 1f);
         TavernSave.objTavern.transform.localScale = new UnityEngine.Vector3(1f, 1f, 1f);
         TavernSave.objTavernScore.SetActive(true);
