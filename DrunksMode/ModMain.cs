@@ -8,8 +8,9 @@ using Il2CppInterop.Runtime;
 using Il2CppSystem.Threading.Tasks;
 using System.Collections.Generic;
 using HarmonyLib;
+using JetBrains.Annotations;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.3", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.4", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksMode;
@@ -76,6 +77,10 @@ public class ModMain : MelonMod
         TavernSave.tavernkeeper = tavernkeeper;
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", bartender);
         Characters.Instance.startGameActOrder = insertAfterAct("Puppet", tavernkeeper);
+
+        AscensionsData allCharactersAscension = ProjectContext.Instance.gameData.allCharactersAscension;
+        allCharactersAscension.startingOutsiders = appendToArray(allCharactersAscension.startingOutsiders,
+        new List<CharacterData> { bartender, tavernkeeper });
 
         float[] circ18difX = new float[] { -60, 0, 20, 0, -80, -250, -105, -60, -20, 20, 60, 105, 250, 80, 0, -20, 0, 60 };
         float[] circ18difY = new float[] { 20, -40, -50, -40, -10, 50, -120, 50, 150, 150, 50, -120, 50, -10, -40, -50, -40, 20 };
@@ -153,18 +158,37 @@ public class ModMain : MelonMod
     }
     public override void OnUpdate()
     {
-        if (TavernSave.allData.Length == 0)
+        if (TavernSave.allData.Count == 0)
         {
             var loadedCharList = Resources.FindObjectsOfTypeAll(Il2CppType.Of<CharacterData>());
             if (loadedCharList != null)
             {
+                /*
                 TavernSave.allData = new CharacterData[loadedCharList.Length];
                 for (int i = 0; i < loadedCharList.Length; i++)
                 {
                     TavernSave.allData[i] = loadedCharList[i]!.Cast<CharacterData>();
                 }
+                */
+                AscensionsData allCharactersAscension = ProjectContext.Instance.gameData.allCharactersAscension;
+                foreach (CharacterData townData in allCharactersAscension.startingTownsfolks)
+                {
+                    TavernSave.allData.Add(townData);
+                }
+                foreach (CharacterData outsData in allCharactersAscension.startingOutsiders)
+                {
+                    TavernSave.allData.Add(outsData);
+                }
+                foreach (CharacterData miniData in allCharactersAscension.startingMinions)
+                {
+                    TavernSave.allData.Add(miniData);
+                }
+                foreach (CharacterData demoData in allCharactersAscension.startingDemons)
+                {
+                    TavernSave.allData.Add(demoData);
+                }
             }
-            if (TavernSave.allData.Length > 0)
+            if (TavernSave.allData.Count > 0)
             {
                 TavernSave.createPool();
                 TavernSave.tavernData.bbt();
@@ -205,6 +229,20 @@ public class ModMain : MelonMod
         }
         return newActList;
     }
+    public CharacterData[] appendToArray(CharacterData[] array, List<CharacterData> additions)
+    {
+        int len = array.Length;
+        CharacterData[] newArray = new CharacterData[len + additions.Count];
+        for (int i = 0; i < len; i++)
+        {
+            newArray[i] = array[i];
+        }
+        for (int j = 0; j < additions.Count; j++)
+        {
+            newArray[len + j] = additions[j];
+        }
+        return newArray;
+    }
 }
 public static class TavernSave
 {
@@ -216,7 +254,7 @@ public static class TavernSave
     public static List<string> poolUnused = new List<string> { "Mutant", "Wretch", "Marionette", "Puppet", "Bounty Hunter", "Bartender" };
     public static List<int> pool = new List<int>();
     public static List<int> poolEvil = new List<int>();
-    public static CharacterData[] allData = Array.Empty<CharacterData>();
+    public static List<CharacterData> allData = new List<CharacterData>();
     public static Sprite[] allSprites = Array.Empty<Sprite>();
     public static CharacterData bartender;
     public static CharacterData tavernkeeper;
@@ -225,7 +263,7 @@ public static class TavernSave
     {
         pool.Clear();
         poolEvil.Clear();
-        for (int i = 0; i < allData.Length; i++)
+        for (int i = 0; i < allData.Count; i++)
         {
             if (!poolUnused.Contains(allData[i].name))
             {

@@ -5,8 +5,9 @@ using Il2CppInterop.Runtime.Injection;
 using Il2Cpp;
 using UnityEngine;
 using Il2CppInterop.Runtime;
+using System.Collections.Generic;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Extra Roles", "1.0", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Extra Roles", "1.1", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksModeExtraRoles;
@@ -46,7 +47,7 @@ public class ModMain : MelonMod
         chef.flavorText = "\"She'll cook up any storm for you, but there are some things that Good just doesn't order.\"";
         chef.tags = new Il2CppSystem.Collections.Generic.List<ECharacterTag>();
         chef.characterId = "Chef_TAVERN";
-        /*
+
         CharacterData beerThrower = createCharData("Beer Thrower", "evil", ECharacterType.Demon,
         EAlignment.Evil, new BeerThower());
         beerThrower.bluffable = false;
@@ -57,7 +58,18 @@ public class ModMain : MelonMod
         beerThrower.hints = "I cannot Corrupt Characters in the same table as the Bartender.\nIf there are no Evils to pick, I will Corrupt a second Villager instead.";
         beerThrower.characterId = "BeerThrower_TAVERN";
         Characters.Instance.startGameActOrder = insertAfterAct("Lilis", beerThrower);
-        */
+
+        AscensionsData allCharactersAscension = ProjectContext.Instance.gameData.allCharactersAscension;
+        allCharactersAscension.startingTownsfolks = appendToArray(allCharactersAscension.startingTownsfolks,
+        new List<CharacterData> { waiter, chef });
+        allCharactersAscension.startingDemons = appendToArray(allCharactersAscension.startingDemons,
+        new List<CharacterData> { beerThrower });
+
+        GameObject objCompendium = GameObject.Find("Game/Menu/Compendium");
+        Compendium compendium = objCompendium.GetComponent<Compendium>();
+        var pages = compendium.pages;
+        CharactersCompendiumPage pageVillage2 = pages[1];
+        CharactersCompendiumPage pageDemon = pages[4];
     }
     public CharacterData createCharData(string name, string bgName, ECharacterType type, EAlignment alignment, Role role, bool picking = false, EAbilityUsage abilityUsage = EAbilityUsage.Once)
     {
@@ -146,6 +158,20 @@ public class ModMain : MelonMod
             LoggerInstance.Msg("");
         }
         return newActList;
+    }
+    public CharacterData[] appendToArray(CharacterData[] array, List<CharacterData> additions)
+    {
+        int len = array.Length;
+        CharacterData[] newArray = new CharacterData[len + additions.Count];
+        for (int i = 0; i < len; i++)
+        {
+            newArray[i] = array[i];
+        }
+        for (int j = 0; j < additions.Count; j++)
+        {
+            newArray[len + j] = additions[j];
+        }
+        return newArray;
     }
 }
 
