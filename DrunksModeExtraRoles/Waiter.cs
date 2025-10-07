@@ -6,6 +6,9 @@ using System;
 using Il2CppSystem.Collections.Generic;
 using Il2Cpp;
 
+using HarmonyLib;
+using UnityEngine.Scripting;
+
 namespace DrunksModeExtraRoles;
 
 [RegisterTypeInIl2Cpp]
@@ -99,3 +102,18 @@ public class Waiter : Role
 
     }
 }
+/*
+[HarmonyPatch(typeof(Character), nameof(Character.eq))]
+public static class BombardierThing
+{
+    public static void Postfix(Character __instance, ref Character evilRef)
+    {
+        GameObject winCon = GameObject.Find("Game/Gameplay/Content/WinConditions");
+        WinConditions winConditions = winCon.GetComponent<WinConditions>();
+        if (__instance.dataRef.characterId == "Bombardier_79093372")
+        {
+            winConditions.rz();
+        }
+    }
+}
+*/

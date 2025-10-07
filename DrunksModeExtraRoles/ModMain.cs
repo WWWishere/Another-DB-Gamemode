@@ -51,7 +51,7 @@ public class ModMain : MelonMod
         CharacterData beerThrower = createCharData("Beer Thrower", "evil", ECharacterType.Demon,
         EAlignment.Evil, new BeerThower());
         beerThrower.bluffable = false;
-        beerThrower.description = "<b>Game Start:</b>\nA random Villager and Evil are Corrupted.";
+        beerThrower.description = "<b>Game Start:</b>\nA random Villager and Evil are Corrupted.\n\nI Lie and Disguise.";
         beerThrower.flavorText = "\"Has been caught at least 20 times for hitting random people with Beers. Refuses to change his habits.\"";
         beerThrower.tags = new Il2CppSystem.Collections.Generic.List<ECharacterTag>();
         beerThrower.tags.Add(ECharacterTag.Corrupt);
@@ -64,7 +64,6 @@ public class ModMain : MelonMod
         new List<CharacterData> { waiter, chef });
         allCharactersAscension.startingDemons = appendToArray(allCharactersAscension.startingDemons,
         new List<CharacterData> { beerThrower });
-
         GameObject objCompendium = GameObject.Find("Game/Menu/Compendium");
         Compendium compendium = objCompendium.GetComponent<Compendium>();
         var pages = compendium.pages;

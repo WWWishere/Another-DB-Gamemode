@@ -55,20 +55,36 @@ public class BeerThower : Demon
         int charactersSize = characters.Count;
         List<Character> list1 = new List<Character>();
         Characters instance = Characters.Instance;
-        foreach (Character character in characters)
+        if (characters.Count == 18)
         {
-            if (character.dataRef.name == "Bartender" || character.statuses.fo((ECharacterStatus)201))
+            foreach (Character character in characters)
             {
-                int barTable = getTablePos(character.id);
-                tables.Remove(barTable);
+                if (character.dataRef.name == "Bartender" || character.statuses.fo((ECharacterStatus)201))
+                {
+                    int barTable = getTablePos(character.id);
+                    tables.Remove(barTable);
+                }
+            }
+            foreach (int tableNum in tables)
+            {
+                int[] table = getTable(tableNum);
+                foreach (int charId in table)
+                {
+                    Character ch = characters[charactersSize - charId];
+                    bool corrupted = ch.statuses.fo(ECharacterStatus.Corrupted);
+                    bool beerThrower = ch.id == charRef.id;
+                    bool notCorrupt = ch.statuses.fo(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
+                    if (!corrupted && !beerThrower && !notCorrupt)
+                    {
+                        list1.Add(ch);
+                    }
+                }
             }
         }
-        foreach (int tableNum in tables)
+        else
         {
-            int[] table = getTable(tableNum);
-            foreach (int charId in table)
+            foreach (Character ch in characters)
             {
-                Character ch = characters[charactersSize - charId];
                 bool corrupted = ch.statuses.fo(ECharacterStatus.Corrupted);
                 bool beerThrower = ch.id == charRef.id;
                 bool notCorrupt = ch.statuses.fo(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
