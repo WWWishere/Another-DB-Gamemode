@@ -27,7 +27,7 @@ public class Trickster : Minion
         {
             if (neighbor.dataRef.type == ECharacterType.Villager && neighbor.alignment == EAlignment.Good)
             {
-                neighbor.ek(charRef.dataRef);
+                neighbor.statuses.fm(DrunkStatic.tricked, charRef);
                 neighbor.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
             }
         }
@@ -39,5 +39,16 @@ public class Trickster : Minion
     public Trickster(IntPtr ptr) : base(ptr)
     {
 
+    }
+}
+[HarmonyPatch(typeof(Character), nameof(Character.el))]
+public static class RegisterTrickster
+{
+    public static void Postfix(Character __instance)
+    {
+        if (__instance.statuses.fo(DrunkStatic.tricked))
+        {
+            __instance.ek(DrunkStatic.trickster);
+        }
     }
 }

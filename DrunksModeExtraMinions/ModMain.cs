@@ -7,7 +7,7 @@ using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Minions Pack", "1.0", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Minions Pack", "1.1", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksModeExtraMinions;
@@ -77,6 +77,7 @@ public class ModMain : MelonMod
         trickster.flavorText = "\"He'll force you to play his little game. In fact, he'll force everyone to play along with him.\"";
         trickster.tags = new Il2CppSystem.Collections.Generic.List<ECharacterTag>();
         trickster.characterId = "Trickster_TAVERN";
+        DrunkStatic.trickster = trickster;
 
         GameObject content = GameObject.Find("Game/Gameplay/Content");
         NightPhase nightPhase = content.GetComponent<NightPhase>();
@@ -197,5 +198,7 @@ public class ModMain : MelonMod
 public static class DrunkStatic
 {
     public static ECharacterStatus unusable = (ECharacterStatus)202;
+    public static ECharacterStatus tricked = (ECharacterStatus)203;
     public static Minion minion = new Minion();
+    public static CharacterData? trickster;
 }

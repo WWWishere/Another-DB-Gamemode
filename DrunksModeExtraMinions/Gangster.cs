@@ -20,9 +20,11 @@ public class Gangster : Minion
     {
         List<SpecialRule> rules = new List<SpecialRule>();
         // Not the best looking thing
-        foreach (Character ch in Gameplay.CurrentCharacters)
+        Gameplay gameplay = Gameplay.Instance;
+        List<CharacterData> characterDatas = gameplay.mo();
+        foreach (CharacterData data in characterDatas)
         {
-            if (ch.dataRef.name == "Lilis")
+            if (data.name == "Lilis")
             {
                 return rules;
             }
@@ -55,6 +57,10 @@ public class Gangster : Minion
     }
     public void checkAddNeighbor(Character neighbor, List<Character> list)
     {
+        if (neighbor.statuses.fo(ECharacterStatus.UnkillableByDemon))
+        {
+            return;
+        }
         if (neighbor.state == ECharacterState.Hidden && neighbor.alignment == EAlignment.Good)
         {
             list.Add(neighbor);
