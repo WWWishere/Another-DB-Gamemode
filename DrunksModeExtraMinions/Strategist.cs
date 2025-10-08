@@ -12,19 +12,19 @@ namespace DrunksModeExtraMinions;
 [RegisterTypeInIl2Cpp]
 public class Strategist : Minion
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         
     }
     public void escape(Character charRef)
     {
         Characters instance = Characters.Instance;
-        Il2CppSystem.Collections.Generic.List<Character> characters = instance.hi(Gameplay.CurrentCharacters);
-        Il2CppSystem.Collections.Generic.List<Character> list = instance.gs(characters, ECharacterType.Minion);
+        Il2CppSystem.Collections.Generic.List<Character> characters = instance.FilterAliveCharacters(Gameplay.CurrentCharacters);
+        Il2CppSystem.Collections.Generic.List<Character> list = instance.FilterRealCharacterType(characters, ECharacterType.Minion);
         List<Character> list2 = new List<Character>();
         foreach (Character ch in list)
         {
@@ -55,7 +55,7 @@ public class Strategist : Minion
         replaceChar(charRef, minionData);
         charRef.statuses = stats2;
         randomMinion.statuses = stats1;
-        charRef.em();
+        charRef.RevealAllReal();
     }
     public void replaceChar(Character ch, CharacterData data)
     {
@@ -73,7 +73,7 @@ public class Strategist : Minion
     }
 }
 
-[HarmonyPatch(typeof(Character), nameof(Character.ep))]
+[HarmonyPatch(typeof(Character), nameof(Character.Kill))]
 public static class StrategistEscapes
 {
     public static bool Prefix(Character __instance)

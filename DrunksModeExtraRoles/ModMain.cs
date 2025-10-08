@@ -7,7 +7,7 @@ using UnityEngine;
 using Il2CppInterop.Runtime;
 using System.Collections.Generic;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Extra Roles", "1.1", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Extra Roles", "1.2", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksModeExtraRoles;

@@ -10,20 +10,22 @@ namespace DrunksModeExtraMinions;
 [RegisterTypeInIl2Cpp]
 public class Brewer : Minion
 {
-    public override ActedInfo bcq(Character charRef)
+    public ECharacterStatus uncurable = (ECharacterStatus)204;
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         
     }
-    public override CharacterData bcz(Character charRef)
+    public override CharacterData GetBluffIfAble(Character charRef)
     {
-        charRef.statuses.fm(ECharacterStatus.Corrupted, charRef);
-        charRef.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
+        charRef.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+        charRef.statuses.AddStatus(uncurable, charRef);
+        charRef.statuses.AddStatus(ECharacterStatus.HealthyBluff, charRef);
         // Cannot grab bcz from Minion
-        return DrunkStatic.minion.bcz(charRef);
+        return DrunkStatic.minion.GetBluffIfAble(charRef);
     }
     public Brewer() : base(ClassInjector.DerivedConstructorPointer<Brewer>())
     {

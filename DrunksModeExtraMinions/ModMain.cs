@@ -7,7 +7,7 @@ using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Minions Pack", "1.1", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod Minions Pack", "1.2", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksModeExtraMinions;

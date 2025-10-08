@@ -11,11 +11,12 @@ namespace DrunksModeExtraRoles;
 [RegisterTypeInIl2Cpp]
 public class BeerThower : Demon
 {
-    public override ActedInfo bcq(Character charRef)
+    public ECharacterStatus uncurable = (ECharacterStatus)204;
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("", null);
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Start)
         {
@@ -59,7 +60,7 @@ public class BeerThower : Demon
         {
             foreach (Character character in characters)
             {
-                if (character.dataRef.name == "Bartender" || character.statuses.fo((ECharacterStatus)201))
+                if (character.dataRef.name == "Bartender" || character.statuses.Contains((ECharacterStatus)201))
                 {
                     int barTable = getTablePos(character.id);
                     tables.Remove(barTable);
@@ -71,9 +72,9 @@ public class BeerThower : Demon
                 foreach (int charId in table)
                 {
                     Character ch = characters[charactersSize - charId];
-                    bool corrupted = ch.statuses.fo(ECharacterStatus.Corrupted);
+                    bool corrupted = ch.statuses.Contains(ECharacterStatus.Corrupted);
                     bool beerThrower = ch.id == charRef.id;
-                    bool notCorrupt = ch.statuses.fo(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
+                    bool notCorrupt = ch.statuses.Contains(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
                     if (!corrupted && !beerThrower && !notCorrupt)
                     {
                         list1.Add(ch);
@@ -85,18 +86,18 @@ public class BeerThower : Demon
         {
             foreach (Character ch in characters)
             {
-                bool corrupted = ch.statuses.fo(ECharacterStatus.Corrupted);
+                bool corrupted = ch.statuses.Contains(ECharacterStatus.Corrupted);
                 bool beerThrower = ch.id == charRef.id;
-                bool notCorrupt = ch.statuses.fo(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
+                bool notCorrupt = ch.statuses.Contains(ECharacterStatus.CorruptionResistant) || ch.dataRef.name == "Puppet";
                 if (!corrupted && !beerThrower && !notCorrupt)
                 {
                     list1.Add(ch);
                 }
             }
         }
-        List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
-        List<Character> list3 = instance.gs(list1, ECharacterType.Minion);
-        List<Character> list4 = instance.gs(list1, ECharacterType.Demon);
+        List<Character> list2 = instance.FilterRealCharacterType(list1, ECharacterType.Villager);
+        List<Character> list3 = instance.FilterRealCharacterType(list1, ECharacterType.Minion);
+        List<Character> list4 = instance.FilterRealCharacterType(list1, ECharacterType.Demon);
         foreach (Character demon in list4)
         {
             list3.Add(demon);
@@ -104,24 +105,27 @@ public class BeerThower : Demon
         if (list2.Count > 0)
         {
             Character randomVillager = list2[UnityEngine.Random.RandomRangeInt(0, list2.Count)];
-            randomVillager.statuses.fm(ECharacterStatus.Corrupted, charRef);
-            randomVillager.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
+            randomVillager.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+            randomVillager.statuses.AddStatus(uncurable, charRef);
+            randomVillager.statuses.AddStatus(ECharacterStatus.MessedUpByEvil, charRef);
             list2.Remove(randomVillager);
         }
         if (list3.Count > 0)
         {
             Character randomMinion = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
-            randomMinion.statuses.fm(ECharacterStatus.Corrupted, charRef);
-            randomMinion.statuses.fm(ECharacterStatus.HealthyBluff, charRef);
-            randomMinion.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
+            randomMinion.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+            randomMinion.statuses.AddStatus(uncurable, charRef);
+            randomMinion.statuses.AddStatus(ECharacterStatus.HealthyBluff, charRef);
+            randomMinion.statuses.AddStatus(ECharacterStatus.MessedUpByEvil, charRef);
         }
         else
         {
             if (list2.Count > 0)
             {
                 Character randomVillager = list2[UnityEngine.Random.RandomRangeInt(0, list2.Count)];
-                randomVillager.statuses.fm(ECharacterStatus.Corrupted, charRef);
-                randomVillager.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
+                randomVillager.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+                randomVillager.statuses.AddStatus(uncurable, charRef);
+                randomVillager.statuses.AddStatus(ECharacterStatus.MessedUpByEvil, charRef);
                 list2.Remove(randomVillager);
             }
         }

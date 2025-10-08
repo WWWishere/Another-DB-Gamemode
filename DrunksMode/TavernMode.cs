@@ -22,11 +22,11 @@ public class TavernMode : AdvancedMode
     public Il2CppSystem.Action action2;
     public Il2CppSystem.Action action4;
     public CharacterData? bartenderData;
-    public override EGameMode bha()
+    public override EGameMode GetGameMode()
     {
         return EGameMode.Standard;
     }
-    public override void bhb()
+    public override void Init()
     {
         GameplayEvents.OnRoundWon += action;
         GameplayEvents.OnDied += action2;
@@ -35,30 +35,30 @@ public class TavernMode : AdvancedMode
         GameData.CurrentVillage = this.tavern;
     }
 
-    public override GameMode bhc()
+    public override GameMode LoadGame()
     {
         return TavernSave.tavern;
     }
 
-    public override void bhe()
+    public override void DeInit()
     {
         GameplayEvents.OnRoundWon -= action;
         GameplayEvents.OnDied -= action2;
         UIEvents.OnUIUpdate -= action4;
     }
 
-    public override int bhf()
+    public override int GetStartingLevel()
     {
         return this.tavern;
     }
-    public override int bhg()
+    public override int GetResetLevel()
     {
         return this.tavern;
     }
 
-    public override void bhl()
+    public override void AbandonRun()
     {
-        this.bhe();
+        this.DeInit();
         score = 0;
         tavern = 1;
         TavernSave.tavern = this;
@@ -66,7 +66,7 @@ public class TavernMode : AdvancedMode
         UIEvents.OnUIUpdate.Invoke();
     }
 
-    public override void bhm()
+    public override void OnStageCompleted()
     {
         Il2CppSystem.Collections.Generic.List<Character> characters = Gameplay.CurrentCharacters;
         foreach (Character character in characters)
@@ -77,11 +77,11 @@ public class TavernMode : AdvancedMode
                 {
                     addScore(drunkBonus);
                 }
-                else if (character.statuses.fo(TavernSave.bt))
+                else if (character.statuses.Contains(TavernSave.bt))
                 {
                     addScore(bartenderBonus);
                 }
-                else if (character.statuses.fo(ECharacterStatus.Corrupted))
+                else if (character.statuses.Contains(ECharacterStatus.Corrupted))
                 {
                     addScore(corruptBonus);
                 }
@@ -91,7 +91,7 @@ public class TavernMode : AdvancedMode
         TavernSave.tavern = this;
     }
 
-    public override void bhn(int score, int level)
+    public override void UpdateScore(int score, int level)
     {
         if (this.tavern < level)
         {
@@ -99,49 +99,48 @@ public class TavernMode : AdvancedMode
         }
     }
 
-    public override int bho()
+    public override int GetScore()
     {
         return this.score;
     }
 
-    public override int bhq()
+    public override int GetCurrentLevel()
     {
         return this.tavern;
     }
 
-    public override bool bhr()
+    public override bool IsLocked()
     {
         return false;
     }
 
-    public override string bhs()
+    public override string GetScores()
     {
         int bestScore = this.bestScore;
         string str1 = string.Format("<size=24>Highest Score: <color=yellow>{0} </size></color>\n<size=24><color=grey>Best Tavern: </color><color=green>{1} </size></color>", bestScore, bestTavern);
         return str1;
     }
 
-    public override string bht()
+    public override string GetSummaryScores()
+    {
+        return string.Format("Score: <color=yellow>{0}<size=22></color>\n\nScore resets on round loss.", this.score);
+    }
+
+    public string GetScoresText()
     {
         int currentScore = this.score;
         string result = string.Format("<color=grey><size=20>Score: </color><color=yellow><size=24>{0}</color>", currentScore);
         return result;
     }
 
-    public void bhx()
+    public new void OnFailed()
     {
         score = 0;
         tavern = 1;
-        TavernSave.createPool();
+        // TavernSave.createPool();
         GameData.CurrentVillage = 0;
 
         TavernSave.tavern = this;
-    }
-
-    public bool bhy(int mod = 0)
-    {
-        int currentLevel = this.tavern;
-        return currentLevel <= mod + 5;
     }
 
     public void editUI()
@@ -156,7 +155,7 @@ public class TavernMode : AdvancedMode
         TMP_Text textVillage = objCurrentVillage2.transform.FindChild("Bg/Text (TMP)").gameObject.GetComponent<TMP_Text>();
         if (textScore != null)
         {
-            textScore.text = this.bht();
+            textScore.text = this.GetScoresText();
             textVillage.text = string.Format("<color=grey><size=20>Tavern: </color><color=white><size=24>{0}</color>", this.tavern);
         }
     }
@@ -171,45 +170,41 @@ public class TavernMode : AdvancedMode
 
     public void replaceBartender(Character charRef, CharacterData newRole)
     {
-        charRef.dv(newRole);
-        charRef.statuses.fn();
-        charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
-        charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
-        charRef.statuses.fm(TavernSave.bt, charRef);
+        charRef.Init(newRole);
+        charRef.statuses.CheckIfCanCurePoisonAndCure();
+        charRef.statuses.AddStatus(ECharacterStatus.CorruptionResistant, charRef);
+        charRef.statuses.AddStatus(ECharacterStatus.UnkillableByDemon, charRef);
+        charRef.statuses.AddStatus(TavernSave.bt, charRef);
     }
 
-    public override AscensionsData bhh()
+    public override AscensionsData GetCurrentAscension()
     {
-        return TavernSave.tavernData;
+        // return TavernSave.tavernData;
+        return TavernSave.tavernDataSet;
     }
 
-    public override AscensionsData bhi()
+    public override AscensionsData GetPreviousAscension()
     {
-        return TavernSave.tavernData;
+        // return TavernSave.tavernData;
+        return TavernSave.tavernDataSet;
     }
 
-    public override bool bhj()
+    public override bool CanResetLevel()
     {
         return true;
-    }
-
-    public override int bhp()
-    {
-        int savedMaxStandardAscension = SavesGame.SavedMaxStandardAscension;
-        return savedMaxStandardAscension;
     }
 
     public TavernMode() : base(ClassInjector.DerivedConstructorPointer<TavernMode>())
     {
         ClassInjector.DerivedConstructorBody((Il2CppObjectBase)this);
-        action = new Action(bhm);
-        action2 = new Action(bhx);
+        action = new Action(OnStageCompleted);
+        action2 = new Action(OnFailed);
         action4 = new Action(editUI);
     }
     public TavernMode(IntPtr ptr) : base(ptr)
     {
-        action = new Action(bhm);
-        action2 = new Action(bhx);
+        action = new Action(OnStageCompleted);
+        action2 = new Action(OnFailed);
         action4 = new Action(editUI);
     }
 }

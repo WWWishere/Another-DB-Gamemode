@@ -11,7 +11,7 @@ namespace DrunksMode;
 [RegisterTypeInIl2Cpp]
 public class Tavernkeeper : Role
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         List<Character> characters = Gameplay.CurrentCharacters;
         List<Character> newList = new List<Character>();
@@ -20,7 +20,7 @@ public class Tavernkeeper : Role
             bool corrupted = false;
             if (character.statuses != null)
             {
-                corrupted = character.statuses.fo(ECharacterStatus.Corrupted);
+                corrupted = character.statuses.Contains(ECharacterStatus.Corrupted);
             }
             if (corrupted)
             {
@@ -31,23 +31,23 @@ public class Tavernkeeper : Role
         ActedInfo actedInfo = new ActedInfo(line);
         return actedInfo;
     }
-    public override ActedInfo bcr(Character charRef)
+    public override ActedInfo GetBluffInfo(Character charRef)
     {
-        return bcq(charRef);
+        return GetInfo(charRef);
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Start)
         {
-            charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
-            charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
+            charRef.statuses.AddStatus(ECharacterStatus.CorruptionResistant, charRef);
+            charRef.statuses.AddStatus(ECharacterStatus.UnkillableByDemon, charRef);
             if (GameData.GameMode is TavernMode)
             {
                 List<Character> allCharacters = Gameplay.CurrentCharacters;
                 Characters instance = Characters.Instance;
                 Gameplay gameplay = Gameplay.Instance;
-                List<Character> list1 = instance.hi(allCharacters);
-                List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
+                List<Character> list1 = instance.FilterAliveCharacters(allCharacters);
+                List<Character> list2 = instance.FilterRealCharacterType(list1, ECharacterType.Villager);
                 List<Character> list3 = new List<Character>();
                 foreach (Character town in list2)
                 {
@@ -58,19 +58,19 @@ public class Tavernkeeper : Role
                 }
                 Character randomCharacter = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
                 TavernMode tavernMode = (TavernMode)GameData.GameMode;
-                tavernMode.bartenderData = randomCharacter.dq();
-                randomCharacter.dv(TavernSave.bartender);
-                gameplay.ml(ECharacterType.Outcast, TavernSave.bartender);
+                tavernMode.bartenderData = randomCharacter.GetCharacterBluffIfAble();
+                randomCharacter.Init(TavernSave.bartender);
+                gameplay.AddScriptCharacter(ECharacterType.Outcast, TavernSave.bartender);
             }
         }
             else if (trigger == ETriggerPhase.Day)
             {
-                this.onActed.Invoke(this.bcq(charRef));
+                this.onActed.Invoke(this.GetInfo(charRef));
             }
     }
-    public override void bcx(ETriggerPhase trigger, Character charRef)
+    public override void BluffAct(ETriggerPhase trigger, Character charRef)
     {
-        this.bcs(trigger, charRef);
+        this.Act(trigger, charRef);
     }
 
     public Tavernkeeper() : base(ClassInjector.DerivedConstructorPointer<Tavernkeeper>())

@@ -12,16 +12,16 @@ namespace DrunksModeExtraMinions;
 [RegisterTypeInIl2Cpp]
 public class Gangster : Minion
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override List<SpecialRule> bcm()
+    public override List<SpecialRule> GetRules()
     {
         List<SpecialRule> rules = new List<SpecialRule>();
         // Not the best looking thing
         Gameplay gameplay = Gameplay.Instance;
-        List<CharacterData> characterDatas = gameplay.mo();
+        List<CharacterData> characterDatas = gameplay.GetScriptCharacters();
         foreach (CharacterData data in characterDatas)
         {
             if (data.name == "Lilis")
@@ -32,7 +32,7 @@ public class Gangster : Minion
         rules.Add(new NightModeRule(4));
         return rules;
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (charRef.state == ECharacterState.Dead)
         {
@@ -41,7 +41,7 @@ public class Gangster : Minion
         if (trigger == ETriggerPhase.Night)
         {
             List<Character> characters = Gameplay.CurrentCharacters;
-            List<Character> list1 = CharactersHelper.tl(characters, charRef);
+            List<Character> list1 = CharactersHelper.GetSortedListWithCharacterFirst(characters, charRef);
             List<Character> targetable = new List<Character>();
             checkAddNeighbor(list1[1], targetable);
             checkAddNeighbor(list1[list1.Count - 1], targetable);
@@ -51,13 +51,13 @@ public class Gangster : Minion
             }
             Character random = targetable[UnityEngine.Random.RandomRange(0, targetable.Count)];
             Health health = PlayerController.PlayerInfo.health;
-            health.jl(2);
-            random.eq(charRef);
+            health.Damage(2);
+            random.KillByDemon(charRef);
         }
     }
     public void checkAddNeighbor(Character neighbor, List<Character> list)
     {
-        if (neighbor.statuses.fo(ECharacterStatus.UnkillableByDemon))
+        if (neighbor.statuses.Contains(ECharacterStatus.UnkillableByDemon))
         {
             return;
         }

@@ -13,17 +13,17 @@ namespace DrunksModeExtraMinions;
 public class Summoner : Minion
 {
     public CharacterData evilDataRef = getBasicMinion();
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Start)
         {
             evilDataRef = getBasicMinion();
             int closestClockwise = 0;
-            List<Character> list1 = CharactersHelper.tl(Gameplay.CurrentCharacters, charRef);
+            List<Character> list1 = CharactersHelper.GetSortedListWithCharacterFirst(Gameplay.CurrentCharacters, charRef);
             for (int i = 1; i < list1.Count; i++)
             {
                 Character ch = list1[list1.Count - i];
@@ -47,17 +47,17 @@ public class Summoner : Minion
                 }
             }
         }
-        evilDataRef.role.bcs(trigger, charRef);
+        evilDataRef.role.Act(trigger, charRef);
     }
-    public override void bct(Character charRef)
+    public override void ActOnDied(Character charRef)
     {
-        evilDataRef.role.bct(charRef);
+        evilDataRef.role.ActOnDied(charRef);
     }
-    public override CharacterData bcz(Character charRef)
+    public override CharacterData GetBluffIfAble(Character charRef)
     {
-        CharacterData data = evilDataRef.role.bcz(charRef);
+        CharacterData data = evilDataRef.role.GetBluffIfAble(charRef);
         // Cannot grab bcz from Minion
-        return DrunkStatic.minion.bcz(charRef);
+        return DrunkStatic.minion.GetBluffIfAble(charRef);
     }
     public static CharacterData getBasicMinion()
     {

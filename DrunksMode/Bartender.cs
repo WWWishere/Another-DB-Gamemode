@@ -11,18 +11,18 @@ namespace DrunksMode;
 [RegisterTypeInIl2Cpp]
 public class Bartender : Role
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("", null);
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger != ETriggerPhase.Start)
         {
             return;
         }
-        charRef.statuses.fm(ECharacterStatus.CorruptionResistant, charRef);
-        charRef.statuses.fm(ECharacterStatus.UnkillableByDemon, charRef);
+        charRef.statuses.AddStatus(ECharacterStatus.CorruptionResistant, charRef);
+        charRef.statuses.AddStatus(ECharacterStatus.UnkillableByDemon, charRef);
     }
     public int[] getTable(int tableNum)
     {
@@ -50,7 +50,7 @@ public class Bartender : Role
         }
         return 3;
     }
-    public override CharacterData? bcz(Character charRef)
+    public override CharacterData? GetBluffIfAble(Character charRef)
     {
         if (GameData.GameMode is TavernMode)
         {
@@ -86,12 +86,13 @@ public class Bartender : Role
         foreach (int charId in table)
         {
             Character ch = characters[charactersSize - charId];
-            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.fo(ECharacterStatus.CorruptionResistant))
+            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.Contains(ECharacterStatus.CorruptionResistant))
             {
-                ch.statuses.fm(ECharacterStatus.Corrupted, charRef, null);
+                ch.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+                ch.statuses.AddStatus(TavernSave.uncurable, charRef);
                 if (ch.dataRef.type == ECharacterType.Minion || ch.dataRef.type == ECharacterType.Demon)
                 {
-                    ch.statuses.fm(ECharacterStatus.HealthyBluff, charRef, null);
+                    ch.statuses.AddStatus(ECharacterStatus.HealthyBluff, charRef);
                 }
             }
         }
@@ -99,7 +100,7 @@ public class Bartender : Role
     public void serveAdjacent(Character charRef)
     {
         List<Character> currentCharacters = Gameplay.CurrentCharacters;
-        List<Character> list1 = CharactersHelper.tl(currentCharacters, charRef);
+        List<Character> list1 = CharactersHelper.GetSortedListWithCharacterFirst(currentCharacters, charRef);
         List<Character> list2 = new List<Character>();
         list2.Add(list1[1]);
         list2.Add(list1[list1.Count - 1]);
@@ -112,12 +113,13 @@ public class Bartender : Role
         }
         foreach (Character ch in list2)
         {
-            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.fo(ECharacterStatus.CorruptionResistant))
+            if (ch.dataRef.name != "Puppet" && ch.dataRef.type != ECharacterType.Outcast && !ch.statuses.Contains(ECharacterStatus.CorruptionResistant))
             {
-                ch.statuses.fm(ECharacterStatus.Corrupted, charRef, null);
+                ch.statuses.AddStatus(ECharacterStatus.Corrupted, charRef);
+                ch.statuses.AddStatus(TavernSave.uncurable, charRef);
                 if (ch.dataRef.type == ECharacterType.Minion || ch.dataRef.type == ECharacterType.Demon)
                 {
-                    ch.statuses.fm(ECharacterStatus.HealthyBluff, charRef, null);
+                    ch.statuses.AddStatus(ECharacterStatus.HealthyBluff, charRef);
                 }
             }
         }
@@ -142,7 +144,7 @@ public class Bartender : Role
                 uniquePool.Add(data);
             }
         }
-        List<CharacterData> townPool = instance.gw(uniquePool, ECharacterType.Villager);
+        List<CharacterData> townPool = instance.FilterRealCharacterType(uniquePool, ECharacterType.Villager);
         CharacterData randomData = townPool[UnityEngine.Random.RandomRangeInt(0, townPool.Count)];
         return randomData;
     }

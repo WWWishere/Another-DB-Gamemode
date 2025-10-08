@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using JetBrains.Annotations;
 
-[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.4", "SS122")]
+[assembly: MelonInfo(typeof(ModMain), "Tavern Mod", "1.5", "SS122")]
 [assembly: MelonGame("UmiArt", "Demon Bluff")]
 
 namespace DrunksMode;
@@ -163,13 +163,11 @@ public class ModMain : MelonMod
             var loadedCharList = Resources.FindObjectsOfTypeAll(Il2CppType.Of<CharacterData>());
             if (loadedCharList != null)
             {
-                /*
-                TavernSave.allData = new CharacterData[loadedCharList.Length];
+                TavernSave.allDataFull = new CharacterData[loadedCharList.Length];
                 for (int i = 0; i < loadedCharList.Length; i++)
                 {
-                    TavernSave.allData[i] = loadedCharList[i]!.Cast<CharacterData>();
+                    TavernSave.allDataFull[i] = loadedCharList[i]!.Cast<CharacterData>();
                 }
-                */
                 AscensionsData allCharactersAscension = ProjectContext.Instance.gameData.allCharactersAscension;
                 foreach (CharacterData townData in allCharactersAscension.startingTownsfolks)
                 {
@@ -190,15 +188,18 @@ public class ModMain : MelonMod
             }
             if (TavernSave.allData.Count > 0)
             {
+                TavernSave.grabFromDataFull("Saint");
+                TavernSave.grabFromDataFull("Bounty Hunter");
                 TavernSave.createPool();
-                TavernSave.tavernData.bbt();
+                TavernSave.createSetPool();
+                TavernSave.tavernData.UpdateCharCounts();
             }
         }
         // Temp start Game option
         if (Input.GetKeyDown(KeyCode.V))
         {
-            TavernSave.createPool();
-            GameData.bgk(TavernSave.tavern);
+            // TavernSave.createPool();
+            GameData.ChangeGameMode(TavernSave.tavern);
         }
     }
     public CharacterData[] insertAfterAct(string previous, CharacterData data)
@@ -247,18 +248,22 @@ public class ModMain : MelonMod
 public static class TavernSave
 {
     public static AscensionsData tavernData = GameObject.Instantiate(ProjectContext.Instance.gameData.advancedAscension);
+    public static AscensionsData tavernDataSet = GameObject.Instantiate(ProjectContext.Instance.gameData.advancedAscension);
     public static AscensionsData dataBase = GameObject.Instantiate(ProjectContext.Instance.gameData.advancedAscension);
     public static TavernMode tavern = new TavernMode();
     public static GameObject objTavernScore;
     public static GameObject objTavern;
-    public static List<string> poolUnused = new List<string> { "Mutant", "Wretch", "Marionette", "Puppet", "Bounty Hunter", "Bartender" };
+    public static List<string> poolUnused = new List<string> { "Mutant", "Marionette", "Puppet", "Bounty Hunter", "Bartender" };
     public static List<int> pool = new List<int>();
     public static List<int> poolEvil = new List<int>();
     public static List<CharacterData> allData = new List<CharacterData>();
+    public static CharacterData[] allDataFull = Array.Empty<CharacterData>();
     public static Sprite[] allSprites = Array.Empty<Sprite>();
     public static CharacterData bartender;
     public static CharacterData tavernkeeper;
     public static ECharacterStatus bt = (ECharacterStatus)201;
+    public static ECharacterStatus uncurable = (ECharacterStatus)204;
+    // Character statues - bt = 201, unusable = 202, tricked = 203, uncurable = 204
     public static void createPool()
     {
         pool.Clear();
@@ -372,6 +377,17 @@ public static class TavernSave
         MelonLogger.Msg("Missing characterData \"" + name + "\"!");
         return null;
     }
+    public static void grabFromDataFull(string name)
+    {
+        foreach (CharacterData data in allDataFull)
+        {
+            if (data.name == name)
+            {
+                allData.Add(data);
+                return;
+            }
+        }
+    }
     public static Sprite? getSprite(string name)
     {
         foreach (Sprite sprite in allSprites)
@@ -443,16 +459,113 @@ public static class TavernSave
         newPools[pools.Length] = pool;
         Characters.Instance.characterPool = newPools;
     }
+    public static List<CharactersCount> evil4 = new List<CharactersCount>()
+    {
+        new CharactersCount(18, 11, 0, 3, 4),
+        new CharactersCount(18, 10, 0, 4, 4),
+        new CharactersCount(18, 12, 1, 2, 3),
+        new CharactersCount(18, 11, 1, 3, 3),
+        new CharactersCount(18, 10, 1, 4, 3),
+        new CharactersCount(18, 12, 2, 2, 2),
+        new CharactersCount(18, 11, 2, 3, 2),
+        new CharactersCount(18, 10, 2, 4, 2),
+    };
+    public static List<CharactersCount> evil5 = new List<CharactersCount>()
+    {
+        new CharactersCount(18, 10, 0, 3, 5),
+        new CharactersCount(18, 12, 1, 1, 4),
+        new CharactersCount(18, 11, 1, 2, 4),
+        new CharactersCount(18, 10, 1, 3, 4),
+        new CharactersCount(18, 9, 1, 4, 4),
+        new CharactersCount(18, 12, 2, 1, 3),
+        new CharactersCount(18, 11, 2, 2, 3),
+        new CharactersCount(18, 10, 2, 3, 3),
+        new CharactersCount(18, 9, 2, 4, 3),
+    };
+    public static List<CharactersCount> evil6 = new List<CharactersCount>()
+    {
+        new CharactersCount(18, 9, 0, 3, 6),
+        new CharactersCount(18, 11, 1, 1, 5),
+        new CharactersCount(18, 10, 1, 2, 5),
+        new CharactersCount(18, 11, 2, 1, 4),
+        new CharactersCount(18, 10, 2, 2, 4),
+        new CharactersCount(18, 9, 2, 3, 4),
+        new CharactersCount(18, 11, 3, 1, 3),
+        new CharactersCount(18, 10, 3, 2, 3),
+    };
 
-    [HarmonyPatch(typeof(Character), nameof(Character.en))]
+    public static void createSetPool()
+    {
+        CustomScriptData evil4Script = createScriptData(evil4);
+        CustomScriptData evil5Script = createScriptData(evil5);
+        CustomScriptData evil6Script = createScriptData(evil6);
+        List<CustomScriptData> dataList = new List<CustomScriptData>
+        {
+            evil4Script,
+            evil5Script,
+            evil6Script
+        };
+        tavernDataSet.possibleScriptsData = dataList.ToArray();
+    }
+    public static CustomScriptData createScriptData(List<CharactersCount> counts)
+    {
+        CustomScriptData newData = new CustomScriptData();
+        ScriptInfo script = new ScriptInfo();
+        newData.scriptInfo = script;
+        foreach (CharacterData data in allData)
+        {
+            if (data.characterId != bartender.characterId)
+            {
+                switch (data.type)
+                {
+                    case ECharacterType.Villager:
+                        script.startingTownsfolks.Add(data);
+                        break;
+                    case ECharacterType.Outcast:
+                        script.startingOutsiders.Add(data);
+                        break;
+                    case ECharacterType.Minion:
+                        script.startingMinions.Add(data);
+                        break;
+                    case ECharacterType.Demon:
+                        script.startingDemons.Add(data);
+                        break;
+                }
+            }
+        }
+        script.mustInclude.Add(tavernkeeper);
+        foreach (CharactersCount count in counts)
+        {
+            script.characterCounts.Add(count);
+        }
+        return newData;
+    }
+
+    [HarmonyPatch(typeof(Character), nameof(Character.RevealAllReal))]
     public static class BartenderText
     {
         public static void Postfix(Character __instance)
         {
-            if (__instance.statuses.fo(bt))
+            if (__instance.statuses.Contains(bt))
             {
                 __instance.chName.text += "<color=orange><size=18>\nBartender</color></size>";
             }
+            if (__instance.dataRef.startingAlignment == EAlignment.Good && __instance.alignment == EAlignment.Evil)
+            {
+                __instance.chName.text += "<color=#964b00><size=18>\nEvil</color></size>";
+            }
+        }
+    }
+    [HarmonyPatch(typeof(CharacterStatuses), nameof(CharacterStatuses.CheckIfCanCurePoisonAndCure))]
+    public class PreventCure
+    {
+        public static bool Prefix(CharacterStatuses __instance)
+        {
+            if (__instance.Contains(TavernSave.uncurable))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

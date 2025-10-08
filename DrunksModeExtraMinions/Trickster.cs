@@ -12,14 +12,14 @@ namespace DrunksModeExtraMinions;
 [RegisterTypeInIl2Cpp]
 public class Trickster : Minion
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         List<Character> characters = Gameplay.CurrentCharacters;
-        List<Character> list1 = CharactersHelper.tl(characters, charRef);
+        List<Character> list1 = CharactersHelper.GetSortedListWithCharacterFirst(characters, charRef);
         List<Character> list2 = new List<Character>();
         list2.Add(list1[1]);
         list2.Add(list1[list1.Count - 1]);
@@ -27,8 +27,8 @@ public class Trickster : Minion
         {
             if (neighbor.dataRef.type == ECharacterType.Villager && neighbor.alignment == EAlignment.Good)
             {
-                neighbor.statuses.fm(DrunkStatic.tricked, charRef);
-                neighbor.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
+                neighbor.statuses.AddStatus(DrunkStatic.tricked, charRef);
+                neighbor.statuses.AddStatus(ECharacterStatus.MessedUpByEvil, charRef);
             }
         }
     }
@@ -41,14 +41,14 @@ public class Trickster : Minion
 
     }
 }
-[HarmonyPatch(typeof(Character), nameof(Character.el))]
+[HarmonyPatch(typeof(Character), nameof(Character.Reveal))]
 public static class RegisterTrickster
 {
     public static void Postfix(Character __instance)
     {
-        if (__instance.statuses.fo(DrunkStatic.tricked))
+        if (__instance.statuses.Contains(DrunkStatic.tricked))
         {
-            __instance.ek(DrunkStatic.trickster);
+            __instance.UpdateRegisterAsRole(DrunkStatic.trickster);
         }
     }
 }

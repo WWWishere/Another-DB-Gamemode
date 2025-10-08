@@ -14,7 +14,7 @@ namespace DrunksModeExtraRoles;
 [RegisterTypeInIl2Cpp]
 public class Waiter : Role
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         List<Character> characters = Gameplay.CurrentCharacters;
         int charactersSize = characters.Count;
@@ -24,7 +24,7 @@ public class Waiter : Role
         foreach (int charId in table)
         {
             Character ch = characters[charactersSize - charId];
-            if (ch.statuses.fo(ECharacterStatus.Corrupted))
+            if (ch.statuses.Contains(ECharacterStatus.Corrupted))
             {
                 corrupted++;
             }
@@ -33,14 +33,14 @@ public class Waiter : Role
         ActedInfo actedInfo = new ActedInfo(line);
         return actedInfo;
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Day)
         {
-            this.onActed.Invoke(this.bcq(charRef));
+            this.onActed.Invoke(this.GetInfo(charRef));
         }
     }
-    public override ActedInfo bcr(Character charRef)
+    public override ActedInfo GetBluffInfo(Character charRef)
     {
         List<Character> characters = Gameplay.CurrentCharacters;
         int charactersSize = characters.Count;
@@ -50,21 +50,21 @@ public class Waiter : Role
         foreach (int charId in table)
         {
             Character ch = characters[charactersSize - charId];
-            if (ch.statuses.fo(ECharacterStatus.Corrupted))
+            if (ch.statuses.Contains(ECharacterStatus.Corrupted))
             {
                 corrupted++;
             }
         }
-        int rand = Calculator.tf(corrupted, 0, 5);
+        int rand = Calculator.RemoveNumberAndGetRandomNumberFromList(corrupted, 0, 5);
         string line = string.Format("There are {0} Corruptions at my table.", rand);
         ActedInfo actedInfo = new ActedInfo(line);
         return actedInfo;
     }
-    public override void bcx(ETriggerPhase trigger, Character charRef)
+    public override void BluffAct(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Day)
         {
-            this.onActed.Invoke(this.bcr(charRef));
+            this.onActed.Invoke(this.GetBluffInfo(charRef));
         }
     }
     public int[] getTable(int tableNum)

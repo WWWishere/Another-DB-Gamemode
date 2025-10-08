@@ -12,17 +12,17 @@ namespace DrunksModeExtraMinions;
 [RegisterTypeInIl2Cpp]
 public class Florist : Minion
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         return new ActedInfo("");
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Start)
         {
             Characters instance = Characters.Instance;
-            List<Character> list1 = instance.hi(Gameplay.CurrentCharacters);
-            List<Character> list2 = instance.gs(list1, ECharacterType.Villager);
+            List<Character> list1 = instance.FilterAliveCharacters(Gameplay.CurrentCharacters);
+            List<Character> list2 = instance.FilterRealCharacterType(list1, ECharacterType.Villager);
             List<Character> list3 = new List<Character>();
             foreach (Character character in list2)
             {
@@ -38,19 +38,19 @@ public class Florist : Minion
             Character randomChar = list3[UnityEngine.Random.RandomRangeInt(0, list3.Count)];
             randomChar.uses = 0;
             randomChar.pickable.SetActive(false);
-            randomChar.statuses.fm(DrunkStatic.unusable, charRef);
-            randomChar.statuses.fm(ECharacterStatus.MessedUpByEvil, charRef);
+            randomChar.statuses.AddStatus(DrunkStatic.unusable, charRef);
+            randomChar.statuses.AddStatus(ECharacterStatus.MessedUpByEvil, charRef);
         }
     }
-    public override void bct(Character charRef)
+    public override void ActOnDied(Character charRef)
     {
         List<Character> characters = Gameplay.CurrentCharacters;
         foreach (Character ch in characters)
         {
-            if (ch.statuses.fo(DrunkStatic.unusable))
+            if (ch.statuses.Contains(DrunkStatic.unusable))
             {
                 ch.statuses.statuses.Remove(DrunkStatic.unusable);
-                ch.ee();
+                ch.RefreshCharacter();
                 break;
             }
         }
@@ -65,12 +65,12 @@ public class Florist : Minion
     }
 }
 
-[HarmonyPatch(typeof(Character), nameof(Character.ee))]
+[HarmonyPatch(typeof(Character), nameof(Character.RefreshCharacter))]
 public static class BlockUsable
 {
     public static void Postfix(Character __instance)
     {
-        if (__instance.statuses.fo(DrunkStatic.unusable))
+        if (__instance.statuses.Contains(DrunkStatic.unusable))
         {
             __instance.uses = 0;
             __instance.pickable.SetActive(false);
@@ -83,7 +83,7 @@ public static class BlockUsable2
 {
     public static void Postfix(Character __instance)
     {
-        if (__instance.statuses.fo(DrunkStatic.unusable))
+        if (__instance.statuses.Contains(DrunkStatic.unusable))
         {
             __instance.uses = 0;
             __instance.pickable.SetActive(false);

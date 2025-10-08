@@ -11,7 +11,7 @@ namespace DrunksModeExtraRoles;
 [RegisterTypeInIl2Cpp]
 public class Chef : Role
 {
-    public override ActedInfo bcq(Character charRef)
+    public override ActedInfo GetInfo(Character charRef)
     {
         int[] groups = new int[] { 0, 0, 0 };
         int[] groupsShuffled = new int[3];
@@ -40,14 +40,14 @@ public class Chef : Role
         ActedInfo actedInfo = new ActedInfo(line);
         return actedInfo;
     }
-    public override void bcs(ETriggerPhase trigger, Character charRef)
+    public override void Act(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Day)
         {
-            this.onActed.Invoke(this.bcq(charRef));
+            this.onActed.Invoke(this.GetInfo(charRef));
         }
     }
-    public override ActedInfo bcr(Character charRef)
+    public override ActedInfo GetBluffInfo(Character charRef)
     {
         int[] groups = new int[] { 0, 0, 0 };
         int[] groupsShuffled = new int[3];
@@ -142,11 +142,11 @@ public class Chef : Role
         ActedInfo actedInfo = new ActedInfo(line);
         return actedInfo;
     }
-    public override void bcx(ETriggerPhase trigger, Character charRef)
+    public override void BluffAct(ETriggerPhase trigger, Character charRef)
     {
         if (trigger == ETriggerPhase.Day)
         {
-            this.onActed.Invoke(this.bcr(charRef));
+            this.onActed.Invoke(this.GetBluffInfo(charRef));
         }
     }
     public int[] getTable(int tableNum)
